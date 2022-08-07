@@ -1,0 +1,28 @@
+#pragma kernel k1
+#pragma kernel k2
+#pragma kernel k3
+
+RWStructuredBuffer<uint> buffer1;
+RWStructuredBuffer<uint> buffer2;
+int xx;
+
+[numthreads(64,1,1)]
+void k1 (uint2 id : SV_DispatchThreadID)
+{
+    buffer1[id.y * 8192 + id.x] += 1;
+    //Result[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+}
+
+[numthreads(256, 1, 1)]
+void k2(uint id : SV_DispatchThreadID)
+{
+    buffer2[id] = buffer1[id];
+}
+
+
+[numthreads(256, 1, 1)]
+void k3(uint id : SV_DispatchThreadID)
+{
+    buffer1[id] -= buffer2[id];
+}
+
